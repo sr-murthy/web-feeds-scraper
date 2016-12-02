@@ -1,7 +1,8 @@
 class Article(object):
 
-    def __init__(self, uuid=None, url=None, title=None, description=None, pub_date=None, image_url=None, html=None):
+    def __init__(self, uuid=None, feed_url=None, url=None, title=None, description=None, pub_date=None, image_url=None, html=None):
         self._uuid = uuid
+        self._feed_url = feed_url
         self._url = url
         self._title = title
         self._description = description
@@ -12,6 +13,10 @@ class Article(object):
     @property
     def uuid(self):
         return self._uuid
+
+    @property
+    def feed_url(self):
+        return self._feed_url
 
     @property
     def url(self):
@@ -40,14 +45,14 @@ class Article(object):
 
 class TaggedArticle(Article):
 
-    def __init__(self, uuid=None, url=None, title=None, description=None, pub_date=None, image_url=None, html=None):
+    def __init__(self, uuid=None, feed_url=None, url=None, title=None, description=None, pub_date=None, image_url=None, html=None):
         self._tags = {
             't1': [],
             't2': [],
             't3': [],
             't4': []
         }
-        super.__init__(uuid, url, title, description, pub_date, image_url, html)
+        super.__init__(uuid, feed_url, url, title, description, pub_date, image_url, html)
 
     @property
     def tags(self):

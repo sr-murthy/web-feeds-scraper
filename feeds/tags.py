@@ -1,8 +1,9 @@
 class Tag(object):
-    def __init__(self, uuid=None, tag_type=None, tags=[], article_uuid=None):
+    def __init__(self, uuid=None, tag_type=None, tags=[], feed_url=None, article_uuid=None):
     	self._uuid = uuid
     	self._tag_type = tag_type
     	self._tags = tags
+    	self._feed_url = feed_url
     	self._article_uuid = article_uuid
 
     @property
@@ -16,6 +17,10 @@ class Tag(object):
     @property
     def tags(self):
     	return self._tags
+    
+    @property
+    def feed_url(self):
+        return self._feed_url
 
     @property
     def article_uuid(self):
@@ -26,5 +31,6 @@ class Tag(object):
     	    'uuid':			self.uuid,
     	    'tag_type': 	self.tag_type,
     	    'tags': 		self.tags,
+    	    'feed_url':		self.feed_url,
     	    'article_uuid': self.article_uuid
     	}
