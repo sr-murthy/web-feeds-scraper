@@ -5,12 +5,9 @@ import requests
 import sys
 
 from multiprocessing.pool import Pool
-from queue import Queue
+from queue import LifoQueue
 from threading import Thread
-from time import (
-    sleep,
-    time,
-)
+from time import time
 from uuid import uuid4
 
 from db import FeedsDB
@@ -21,34 +18,41 @@ from feeds.articles import (
 )
 from feeds.tags import Tag
 from utils import (
-    get_inner_tag,
     get_article_urls,
+    get_inner_tag,
 )
 
 def scrape_feed(feed_url):
 
-    def scrape_feed_article(article_url):
-        print('\tSCRAPER: in article scraper thread for {}'.format(article_url))
-        text = requests.get(article_url).text
-        db = FeedsDB()
-        article = Article(uuid=str(uuid4()), url=article_url, html=text)
-        res = db.save('article', article)
-        print('\tSCRAPER: saved article {}'.format(article_url))
-        
     article_urls = get_article_urls(requests.get(feed_url).text)
+    article_queue = LifoQueue()
+    for url in article_urls:
+        article_queue.put(url)
+
+    def scrape_article():
+        while not article_queue.empty():
+            url = article_queue.get()
+            print('\tSCRAPER:{}: saving article {}'.format(feed_url, url))
+            text = requests.get(url).text
+            db = FeedsDB()
+            article = Article(uuid=str(uuid4()), url=url, html=text)
+            db.save('article', article)
+            article_queue.task_done()
+
     article_threads = []
-    for article_url in article_urls:
-        print('\t\tSCRAPER: scraping feed {}: saving article {} to db'.format(feed_url, article_url))
-        t = Thread(target=scrape_feed_article, args=(article_url,))
-        article_threads.append(t)
+    for i in range(len(article_urls)):
+        t = Thread(target=scrape_article)
         t.start()
+        article_threads.append(t)
 
-    for t in article_threads:
-        t.join()
-
+    article_queue.join()
+    return len(article_urls)
+    
 if __name__ == '__main__':
     print('\n\tWelcome to the RSS feed scraper!')
+   
     FeedsDB.setup()
+
     while(True):
         option = input(     
             '\n\tPlease enter a comma-separated list of RSS feed URLs to scrape ('
@@ -56,12 +60,23 @@ if __name__ == '__main__':
             'database), or type "Q" to exit.\n\n\t>> '
         )
         if not option == 'Q':
+            total_articles = 0
+
+            def count_articles(num):
+                global total_articles
+                total_articles += num
+
             feed_urls = [url.strip() for url in option.split(',')]
+            num = len(feed_urls)
+            pool = Pool(num)
+
             start_time = time()
-            pool = Pool(processes=len(feed_urls))
-            pool.map(scrape_feed, feed_urls)
+            for url in feed_urls:
+                pool.apply_async(scrape_feed, args=(url,), callback=count_articles)
+            pool.close()
+            pool.join()
             end_time = time() - start_time
-            print('\n\tSCRAPER: Scraped {} RSS feeds in {} seconds.'.format(len(feed_urls), end_time))
-        sys.exit(0)
 
-
+            print('\n\tScraped {} articles from {} RSS feeds in {} seconds.\n'.format(total_articles, len(feed_urls), round(end_time, 3)))
+        else:
+            sys.exit(0)

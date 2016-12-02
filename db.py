@@ -31,15 +31,15 @@ class FeedsDB(object):
                     tuple(values)
                 )
                 row_id = cursor.lastrowid
-                print('\tIN DB: Inserted row #{} into table \'{}\''.format(row_id, table))                
             if row_id:
                 db.commit()
+                #print('\tIN DB: Inserted row #{} into table \'{}\''.format(row_id, table))                
                 return row_id
             else:
                 raise Exception('Failed insert')
        
     def save(self, table, model_inst):
-        print('\tIN DB: saving {} to table \'{}\''.format(model_inst, table))
+        #print('\tIN DB: saving {} to table \'{}\''.format(model_inst, table))
         columns = [attr.strip('_') for attr in list(model_inst.__dict__.keys())]
         values = [val if val else '' for val in [getattr(model_inst, attr) for attr in columns]]
         self._insert_row(table, columns, values)
