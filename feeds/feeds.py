@@ -22,7 +22,8 @@ class Feed(object):
 	def feed_articles(self):
 		return self._feed_articles	
 
-	@feed_url.setter	def feed_url(self, feed_url):
+	@feed_url.setter
+	def feed_url(self, feed_url):
 		self._feed_url = feed_url
 
 	@feed_description.setter
@@ -39,5 +40,6 @@ class Feed(object):
 
 class RSSFeed(Feed):
 	def __init__(self, feed_url=None, feed_description=None, feed_articles=[]):
-		super.__init__(feed_url, feed_description, feed_format='RSS', feed_articles)
+		feed_format = 'RSS'
+		super.__init__(feed_url, feed_description, feed_format, feed_articles)
 
