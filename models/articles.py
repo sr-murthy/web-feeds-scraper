@@ -41,27 +41,3 @@ class Article(object):
     @property
     def html(self):
         return self._html
-
-
-class TaggedArticle(Article):
-
-    def __init__(self, uuid=None, feed_url=None, url=None, title=None, description=None, pub_date=None, image_url=None, html=None):
-        self._tags = {
-            't1': [],
-            't2': [],
-            't3': [],
-            't4': []
-        }
-        super.__init__(uuid, feed_url, url, title, description, pub_date, image_url, html)
-
-    @property
-    def tags(self):
-        return self._tags
-
-    @property
-    def tagged(self, tag_type):
-        return (
-            isinstance(self._tags[tag_type], list) and 
-            self._tags[tag_type] > [] and
-            all(isinstance(tag, str) for tag in self._tags[tag_type])
-        )

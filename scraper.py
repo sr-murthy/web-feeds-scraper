@@ -11,12 +11,8 @@ from time import time
 from uuid import uuid4
 
 from db import FeedsDB
-from feeds.feeds import RSSFeed
-from feeds.articles import (
-    Article,
-    TaggedArticle,
-)
-from feeds.tags import Tag
+from models.articles import Article
+from models.tags import Tag
 from utils import (
     get_article_urls,
     get_inner_tag,
