@@ -69,6 +69,16 @@ if __name__ == '__main__':
 
             feed_urls = [url.strip() for url in option.split(',')]
             num = len(feed_urls)
+            # The process pool for scraping feed URLs - so each feed URL is
+            # "processed" by a separate process, but inside a process the
+            # article HTML content extraction, saving to the db, and potentially
+            # the tagging, occurs via threads, one thread per article. On a
+            # multi-core processor machine the processes could be distributed
+            # over the different cores by the OS scheduler, but there is no way
+            # of guaranteeing this at the code level. I considered using Redis,
+            # but being unfamiliar with it, and given time constraints, I figured
+            # it was simpler to use multi-processing and sub-process multi-threading
+            # to get working model.
             pool = Pool(num)
 
             start_time = time()

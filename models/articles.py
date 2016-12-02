@@ -41,3 +41,4 @@ class Article(object):
     @property
     def html(self):
         return self._html
+ 
