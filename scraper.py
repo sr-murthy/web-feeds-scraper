@@ -18,9 +18,12 @@ from utils import (
     get_inner_tag,
 )
 
+# This method could become part of a FeedScraper class, which is
+# then initialised and used by the script main method as required.
 def scrape_feed(feed_url):
 
     article_urls = get_article_urls(requests.get(feed_url).text)
+    # LifoQueue leads to better run times than Queue (FIFO)
     article_queue = LifoQueue()
     for url in article_urls:
         article_queue.put(url)
@@ -33,6 +36,8 @@ def scrape_feed(feed_url):
             db = FeedsDB()
             article = Article(uuid=str(uuid4()), url=url, html=text)
             db.save('article', article)
+            # further work required to create and save article tags to db, using
+            # the same threading model as for feed urls but inside scrape_feed
             article_queue.task_done()
 
     article_threads = []

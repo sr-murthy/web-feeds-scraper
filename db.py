@@ -7,6 +7,8 @@ import sys
 
 class FeedsDB(object):
 
+    # No path checking here, assume the files will live in same directory
+    # as the scraper and db.py.
     DB_FILE = 'feeds.db'
     DB_SCHEMA = 'schema.sql'
 
@@ -30,16 +32,18 @@ class FeedsDB(object):
                     ),
                     tuple(values)
                 )
+                # Not necessary, but useful to leave in for unit testing.
                 row_id = cursor.lastrowid
             if row_id:
                 db.commit()
-                #print('\tIN DB: Inserted row #{} into table \'{}\''.format(row_id, table))                
                 return row_id
             else:
                 raise Exception('Failed insert')
        
     def save(self, table, model_inst):
-        #print('\tIN DB: saving {} to table \'{}\''.format(model_inst, table))
+        # Note: I assume that the model field names are identical to the
+        # corresponding table column names, with the exception of the
+        # '_' prefix. This makes it easier possible to write this method generically.
         columns = [attr.strip('_') for attr in list(model_inst.__dict__.keys())]
         values = [val if val else '' for val in [getattr(model_inst, attr) for attr in columns]]
         self._insert_row(table, columns, values)
