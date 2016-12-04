@@ -8,7 +8,6 @@ from multiprocessing import (
     current_process,
     Pool,
 )
-from threading import Thread
 from time import (
     sleep,
     time,
@@ -20,61 +19,69 @@ from models import (
     Article,
     Tag,
 )
-from utils import scrape_article_urls
+from utils import (
+    scrape_inner_tag,
+    scrape_article_urls,
+    scrape_article_meta_property,
+)
 
 def get_article_urls(feed_url):
     print('\tSCRAPER: getting article urls for feed {}'.format(feed_url))
-    return feed_url, scrape_article_urls(requests.get(feed_url).text)
+    article_urls = [
+        url for url in scrape_article_urls(requests.get(feed_url).text)
+        if not url.endswith('.xml')
+    ]
+    return feed_url, article_urls
 
-def process_article(feed_url, url):
+def save_article(feed_url, url):
+    print('\tSCRAPER: {}: saving article {}'.format(current_process().name, url))
     text = requests.get(url).text
-    # I am only setting the object fields matching the non-null columns of the 'article'
-    # table. The meta properties from the article HTML could easily be scraped, but
-    # this has been omitted.
-    save_article(Article(uuid=str(uuid4()), feed_url=feed_url,url=url, html=text))
-
-def save_article(article):
+    title = scrape_inner_tag(text, 'title')
+    description = pub_date = image_url = ''
+    try:
+       description = scrape_article_meta_property(text, 'description')[0]
+    except IndexError:
+        try:
+            description = scrape_article_meta_property(text, 'og:description')[0]
+        except IndexError:
+            pass
+    try:
+        pub_date = scrape_article_meta_property(text, 'article:published_time')[0]
+    except IndexError:
+        try:
+            pub_date = scrape_article_meta_property(text, 'article:published')[0]
+        except IndexError:
+            pass
+    try:
+        image_url = scrape_article_meta_property(text, 'thumbnail')[0]
+    except IndexError:
+        pass
+    article = Article(
+        uuid=str(uuid4()),
+        feed_url=feed_url,
+        url=url,
+        html=text,
+        title=title,
+        description=description,
+        pub_date=pub_date,
+        image_url=image_url
+    )
+    print('\tSCRAPER: {}: saving article ({}, {})'.format(current_process().name, article.uuid, url))
     db = FeedsDB()
     db.save(article)
     tag_article(article)
 
 def tag_article(article):
-    tag_types = ['t1', 't2', 't3', 't4']
-    def tag_article(article, tag_type):
-        tag_json = {
-            'uuid': str(uuid4()),
-            'tag_type': tag_type,
-            'tags': ['{} tags'.format(tag_type)],
-            'feed_url': article.feed_url,
-            'article_url': article.url,
-            'article_uuid': article.uuid
-        }
-        save_tag(tag_json)
-    tag_threads = dict(
-        (tt,Thread(
-            name='{}-{}'.format(tt, article.uuid),
-            daemon=False,
-            target=tag_article,
-            args=(article, tt,))
-        ) for tt in tag_types
-    )
-    for tt in tag_types[:3]:
-        tag_threads[tt].start()
-    for tt in tag_types[:3]:
-        tag_threads[tt].join()
-    while tag_threads['t1'].is_alive():
-        sleep(0.01)
-    tag_threads['t4'].start()
-    tag_threads['t4'].join()
-
-def save_tag(tag_json):
+    print('\tSCRAPER: {}: tagging article ({}, {})'.format(current_process().name, article.uuid, article.url))
+    tags = scrape_article_meta_property(article.html, 'keywords')
+    print('\tSCRAPER: {}: found tags {} for article ({}, {})'.format(current_process().name, tags, article.uuid, article.url))
     tag = Tag(
-        uuid=tag_json['uuid'],
-        tag_type=tag_json['tag_type'],
-        tags=tag_json['tags'],
-        feed_url=tag_json['feed_url'],
-        article_uuid=tag_json['article_uuid']
+        uuid=str(uuid4()),
+        tags=','.join(tags),
+        feed_url=article.feed_url,
+        article_uuid=article.uuid
     )
+    print('\tSCRAPER: {}: tagging article ({}, {})'.format(current_process().name, article.uuid, article.url))
     db = FeedsDB()
     db.save(tag)
 
@@ -114,7 +121,7 @@ if __name__ == '__main__':
                     pool.apply_async(get_article_urls, args=(url,), callback=build_article_urls)
                 pool.close()
                 pool.join()
-
+                print('\tSCRAPER: article_urls = {}'.format(article_urls))
                 input_size = successes = len(article_urls)
                 print('\n\tSCRAPER: {} articles to be scraped from {} RSS feeds.'.format(input_size, len(feed_urls)))
                 sleep(3)
@@ -133,7 +140,7 @@ if __name__ == '__main__':
                 # not really help, even if this were run on a system with many more physical cores.              
                 pool = Pool(min(input_size, 150))
                 for feed_url, article_url in article_urls:
-                    pool.apply_async(process_article, args=(feed_url, article_url,))
+                    pool.apply_async(save_article, args=(feed_url, article_url,))
                 pool.close()
                 pool.join()
                 total_time = time() - start_time

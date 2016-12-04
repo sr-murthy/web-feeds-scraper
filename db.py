@@ -60,6 +60,9 @@ class FeedsDB(object):
         # assumption makes it easier to write this method generically and for the
         # scraper calling method to save model instances to the db.
         table = model_inst.__class__.__name__.lower()
+        print('\tDB: saving object ({}, {}) to database table {}'.format(model_inst, model_inst.uuid, table))
         columns = [key.strip('_') for key in model_inst.__dict__]
         values = [model_inst.__dict__[key] if model_inst.__dict__[key] else '' for key in model_inst.__dict__]
+        if table == 'tag':
+            print('\tDB: inserting values {} for object ({}, {})'.format(values, model_inst, model_inst.uuid))
         self._insert_row(table, columns, values)

@@ -12,7 +12,6 @@ create table article (
 
 create table tag (
     uuid         text primary key not null,
-    tag_type     text not null,
     tags         text not null,
     feed_url     text not null,
     article_uuid text not null,

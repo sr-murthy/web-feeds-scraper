@@ -11,6 +11,10 @@ class FeedsDBModel(object):
     def __init__(self, uuid=str(uuid4())):
         self._uuid = uuid
 
+    @property
+    def uuid(self):
+        return self._uuid
+
     def to_json(self):
         return dict((key.strip('_'),self.__dict__[key]) for key in self.__dict__)
 
@@ -27,7 +31,7 @@ class Article(FeedsDBModel):
         image_url=None,
         html=None
     ):
-        super().__init__() if not uuid else super().__init__(uuid)
+        super().__init__(uuid)
         self._feed_url = feed_url
         self._url = url
         self._title = title
@@ -35,10 +39,6 @@ class Article(FeedsDBModel):
         self._pub_date = pub_date
         self._image_url = image_url
         self._html = html
-
-    @property
-    def uuid(self):
-        return self._uuid
 
     @property
     def feed_url(self):
@@ -73,24 +73,14 @@ class Tag(FeedsDBModel):
     def __init__(
         self,
         uuid=str(uuid4()),
-        tag_type=None,
         tags=[],
         feed_url=None,
         article_uuid=None
     ):
-        super().__init__() if not uuid else super().__init__(uuid)
-        self._tag_type = tag_type
+        super().__init__(uuid)
         self._tags = ','.join(tags)
         self._feed_url = feed_url
         self._article_uuid = article_uuid
-
-    @property
-    def uuid(self):
-        return self._uuid
-
-    @property
-    def tag_type(self):
-        return self._tag_type
 
     @property
     def tags(self):
