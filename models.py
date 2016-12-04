@@ -18,7 +18,7 @@ class FeedsDBModel(object):
 class Article(FeedsDBModel):
     def __init__(
         self,
-        uuid=None,
+        uuid=str(uuid4()),
         feed_url=None,
         url=None,
         title=None,
@@ -27,8 +27,7 @@ class Article(FeedsDBModel):
         image_url=None,
         html=None
     ):
-        super().__init__()
-        self._uuid = uuid
+        super().__init__() if not uuid else super().__init__(uuid)
         self._feed_url = feed_url
         self._url = url
         self._title = title
@@ -71,9 +70,15 @@ class Article(FeedsDBModel):
  
 
 class Tag(FeedsDBModel):
-    def __init__(self, uuid=None, tag_type=None, tags=[], feed_url=None, article_uuid=None):
-        super().__init__()
-        self._uuid = uuid
+    def __init__(
+        self,
+        uuid=str(uuid4()),
+        tag_type=None,
+        tags=[],
+        feed_url=None,
+        article_uuid=None
+    ):
+        super().__init__() if not uuid else super().__init__(uuid)
         self._tag_type = tag_type
         self._tags = ','.join(tags)
         self._feed_url = feed_url

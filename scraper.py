@@ -131,7 +131,7 @@ if __name__ == '__main__':
                 # which uses reserved locks to limit more than one process writing to the database
                 # at any given time. Therefore, increasing the process pool here substantially would
                 # not really help, even if this were run on a system with many more physical cores.              
-                pool = Pool(input_size if input_size <= 150 else 150)
+                pool = Pool(min(input_size, 150))
                 for feed_url, article_url in article_urls:
                     pool.apply_async(process_article, args=(feed_url, article_url,))
                 pool.close()

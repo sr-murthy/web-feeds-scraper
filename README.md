@@ -1,6 +1,6 @@
 # Web Feeds Scraper
 
-A command-line client to scrape web feeds (initially RSS only, but extensible to supported feeds) and save their article HTML content (and other article attributes) to a relational database (SQLite3 in this case, but it could support any relational database). This also includes the tagging of articles and saving the tag data to the same database.
+A command-line client to scrape web feeds (initially RSS only, but extensible to supported feeds) and save their article HTML content (and other article attributes) to a local SQLite3 database (this could be replaced by any relational database with a suitable Python binding, with minimal change of code in the database module). The current version uses mocked tagging (mocked tagging of articles and saving dummy tag objects to the database) but this will be replaced by a fully functional tag extraction and save feature.
 
 The database has the following simple schema:
     
