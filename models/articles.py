@@ -1,6 +1,16 @@
 class Article(object):
 
-    def __init__(self, uuid=None, feed_url=None, url=None, title=None, description=None, pub_date=None, image_url=None, html=None):
+    def __init__(
+        self,
+        uuid=None,
+        feed_url=None,
+        url=None,
+        title=None,
+        description=None,
+        pub_date=None,
+        image_url=None,
+        html=None
+    ):
         self._uuid = uuid
         self._feed_url = feed_url
         self._url = url

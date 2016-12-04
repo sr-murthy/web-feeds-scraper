@@ -2,7 +2,7 @@ class Tag(object):
     def __init__(self, uuid=None, tag_type=None, tags=[], feed_url=None, article_uuid=None):
     	self._uuid = uuid
     	self._tag_type = tag_type
-    	self._tags = tags
+    	self._tags = ','.join(tags)
     	self._feed_url = feed_url
     	self._article_uuid = article_uuid
 

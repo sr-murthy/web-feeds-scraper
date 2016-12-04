@@ -31,28 +31,21 @@ Example usage:
 
     Welcome to the RSS feed scraper!
 
-    creating database feeds.db ... 
-    creating schema for feeds.db ... 
+    DB does not exist, creating DB feeds.db ... 
+    creating DB schema 
 
     Please enter a comma-separated list of RSS feed URLs to scrape (the scraper saves all articles in the feed to a local database), or type "Q" to exit.
 
-    >> http://rss.nytimes.com/services/xml/rss/nyt/HomePage.xml, http://feeds.bbci.co.uk/news/england/rss.xml?edition=uk
-    
-    SCRAPER:http://feeds.bbci.co.uk/news/england/rss.xml?edition=uk: saving article http://www.bbc.co.uk/sport/basketball/38146864
-    SCRAPER:http://feeds.bbci.co.uk/news/england/rss.xml?edition=uk: saving article http://www.bbc.co.uk/sport/rugby-union/38179527
-    SCRAPER:http://feeds.bbci.co.uk/news/england/rss.xml?edition=uk: saving article http://www.bbc.co.uk/sport/football/38172446
-    ...
-    ...
-    ...
-    SCRAPER:http://rss.nytimes.com/services/xml/rss/nyt/HomePage.xml: saving article http://www.nytimes.com/2016/12/02/us/politics/donald-trump-transition.html
-    SCRAPER:http://rss.nytimes.com/services/xml/rss/nyt/HomePage.xml: saving article http://www.nytimes.com/2016/12/01/us/politics/trumps-off-the-cuff-remarks-to-world-leaders-leave-diplomats-aghast.html
-    SCRAPER:http://rss.nytimes.com/services/xml/rss/nyt/HomePage.xml: saving article http://www.nytimes.com/2016/12/01/us/politics/james-mattis-secrtary-of-defense-trump.html
-
-    Scraped 64 articles from 2 RSS feeds in 2.194 seconds.
+    >> http://rss.nytimes.com/services/xml/rss/nyt/HomePage.xml, http://feeds.bbci.co.uk/news/england/rss.xml?edition=uk, http://feeds.skynews.com/feeds/rss/uk.xml, http://newsrss.bbc.co.uk/rss/newsonline_uk_edition/in_depth/uk/2001/uk_and_the_euro/rss.xml, http://www.telegraph.co.uk/sport/rss.xml, https://www.theguardian.com/uk/rss
 
 
+    SCRAPER: getting article urls for feed http://rss.nytimes.com/services/xml/rss/nyt/HomePage.xml
+    SCRAPER: getting article urls for feed http://feeds.bbci.co.uk/news/england/rss.xml?edition=uk
+    SCRAPER: getting article urls for feed http://feeds.skynews.com/feeds/rss/uk.xml
+    SCRAPER: getting article urls for feed http://newsrss.bbc.co.uk/rss/newsonline_uk_edition/in_depth/uk/2001/uk_and_the_euro/rss.xml
+    SCRAPER: getting article urls for feed http://www.telegraph.co.uk/sport/rss.xml
+    SCRAPER: getting article urls for feed https://www.theguardian.com/uk/rss
 
+    SCRAPER: 384 articles to be scraped from 6 RSS feeds.
 
-
-
-
+    SCRAPER: Scraped 384/384 articles from 6 RSS feeds in 13.553 seconds (@ 28.334 articles per second). 0 errors encountered.
