@@ -23,28 +23,29 @@ class FeedsDB(object):
                     db.executescript(schema)
 
     def _insert_row(self, table, columns, values):
-        row_id = None
         with sqlite3.connect(self.DB_FILE, timeout=5000) as db:
             with closing(db.cursor()) as cursor:
-                cursor.execute(
-                    """insert into {} ({}) values ({})""".format(
+                try:                    
+                    statement = """insert into {} ({}) values ({})""".format(
                         table, ','.join(columns), '{}'.format(','.join(['?'] * len(values)))
-                    ),
-                    tuple(values)
-                )
-                # Not necessary, but useful to leave in for unit testing.
-                row_id = cursor.lastrowid
-            if row_id:
-                db.commit()
-                return row_id
-            else:
-                raise Exception('Failed insert into table {}'.format(table))
+                    )
+                    cursor.execute(
+                        statement,
+                        tuple(values)
+                    )
+                except sqlite3.DatabaseError as e:
+                    print('\tIN DB: ERROR: {}'.format(str(e)))
+                else:
+                    db.commit()
+                    return cursor.lastrowid
        
     def save(self, model_inst):
-        # Note: I assume that the model field names are identical to the
-        # corresponding table column names, with the exception of the
-        # '_' prefix. This makes it easier possible to write this method generically.
+        # Note: I assume that the model class names are capitalized versions of
+        # the corresponding table names and the model field names are identical to the
+        # corresponding table column names after stripping the '_' prefix. This
+        # assumption makes it easier to write this method generically and for the
+        # scraper calling method to save model instances to the db.
         table = model_inst.__class__.__name__.lower()
-        columns = [attr.strip('_') for attr in list(model_inst.__dict__.keys())]
-        values = [val if val else '' for val in [getattr(model_inst, attr) for attr in columns]]
+        columns = [key.strip('_') for key in model_inst.__dict__]
+        values = [model_inst.__dict__[key] if model_inst.__dict__[key] else '' for key in model_inst.__dict__]
         self._insert_row(table, columns, values)

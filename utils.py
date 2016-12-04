@@ -11,5 +11,4 @@ def scrape_article_urls(feed_text):
         if not it.startswith('<?xml'):
             url = scrape_inner_tag(it, 'link')
             article_urls.append(url)
-
     return article_urls

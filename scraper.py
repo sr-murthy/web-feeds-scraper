@@ -16,8 +16,10 @@ from time import (
 from uuid import uuid4
 
 from db import FeedsDB
-from models.articles import Article
-from models.tags import Tag
+from models import (
+    Article,
+    Tag,
+)
 from utils import scrape_article_urls
 
 def get_article_urls(feed_url):
@@ -87,7 +89,7 @@ if __name__ == '__main__':
             print('\n')
             # The "global" list of article URLs built from all feed URLs
             article_urls = []
-            errors = 0
+            successes = errors = 0
 
             def build_article_urls(url_tuple):
                 feed_url = url_tuple[0]
@@ -104,22 +106,22 @@ if __name__ == '__main__':
                 pool.close()
                 pool.join()
 
-                input_size = len(article_urls)
+                input_size = successes = len(article_urls)
                 print('\n\tSCRAPER: {} articles to be scraped from {} RSS feeds.'.format(input_size, len(feed_urls)))
                 sleep(3)
 
                 start_time = time()                
                 pool = Pool(input_size if input_size <= 150 else 150)
-                for url_tuple in article_urls:
-                    pool.apply_async(process_article, args=(url_tuple[0], url_tuple[1],))
+                for feed_url, article_url in article_urls:
+                    pool.apply_async(process_article, args=(feed_url, article_url,))
                 pool.close()
                 pool.join()
                 total_time = time() - start_time
             except Exception as e:
                 print('\tSCRAPER: {}'.format(str(e)))
                 errors += 1
-            else:
                 successes = len(article_urls) - errors
+            else:
                 print(
                     '\n\tSCRAPER: Scraped {}/{} articles from {} RSS feeds in {} seconds '
                     '(@ {} articles per second). {} errors encountered.\n'.

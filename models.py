@@ -1,5 +1,14 @@
-class Article(object):
+from uuid import uuid4
 
+class FeedsDBModel(object):
+    def __init__(self, uuid=str(uuid4())):
+        self._uuid = uuid
+
+    def to_json(self):
+        return dict((key.strip('_'),self.__dict__[key]) for key in self.__dict__)
+
+
+class Article(FeedsDBModel):
     def __init__(
         self,
         uuid=None,
@@ -11,6 +20,7 @@ class Article(object):
         image_url=None,
         html=None
     ):
+        super().__init__()
         self._uuid = uuid
         self._feed_url = feed_url
         self._url = url
@@ -52,3 +62,33 @@ class Article(object):
     def html(self):
         return self._html
  
+
+class Tag(FeedsDBModel):
+    def __init__(self, uuid=None, tag_type=None, tags=[], feed_url=None, article_uuid=None):
+        super().__init__()
+        self._uuid = uuid
+        self._tag_type = tag_type
+        self._tags = ','.join(tags)
+        self._feed_url = feed_url
+        self._article_uuid = article_uuid
+
+    @property
+    def uuid(self):
+        return self._uuid
+
+    @property
+    def tag_type(self):
+        return self._tag_type
+
+    @property
+    def tags(self):
+        return self._tags
+    
+    @property
+    def feed_url(self):
+        return self._feed_url
+
+    @property
+    def article_uuid(self):
+        return self._article_uuid
+
