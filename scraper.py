@@ -28,6 +28,9 @@ def get_article_urls(feed_url):
 
 def process_article(feed_url, url):
     text = requests.get(url).text
+    # I am only setting the object fields matching the non-null columns of the 'article'
+    # table. The meta properties from the article HTML could easily be scraped, but
+    # this has been omitted.
     save_article(Article(uuid=str(uuid4()), feed_url=feed_url,url=url, html=text))
 
 def save_article(article):
@@ -74,6 +77,9 @@ def save_tag(tag_json):
     )
     db = FeedsDB()
     db.save(tag)
+
+# The methods above could all be bundled into a class, but for simplicity
+# I have chosen to make them standalone methods.
     
 if __name__ == '__main__':
     print('\n\tWelcome to the RSS feed scraper!')
@@ -89,6 +95,9 @@ if __name__ == '__main__':
             print('\n')
             # The "global" list of article URLs built from all feed URLs
             article_urls = []
+            # Keeping count of the number of articles successfully saved
+            # and tagged, and the number of general errors in the main loop.
+            # Specific case exception handling has been omitted for simplicity.
             successes = errors = 0
 
             def build_article_urls(url_tuple):
@@ -110,7 +119,18 @@ if __name__ == '__main__':
                 print('\n\tSCRAPER: {} articles to be scraped from {} RSS feeds.'.format(input_size, len(feed_urls)))
                 sleep(3)
 
-                start_time = time()                
+                start_time = time()
+                # A natural limit of about 150 processes was observed on the development system
+                # (MacBook Air mid-2012 model with an Intel Core i5 processor with 2 physical cores
+                # and 4 logical cores. A higher number of processes caused a noticeable slowing down.
+                # The OS scheduler distributes the processes over the cores, which implies an
+                # average of about 37.4 processes per logical core and 75 processes per physical core
+                # on the development machine, assuming full throughput by the scheduler. However,
+                # the processes here will become progressively more I/O-bound because they create a
+                # chain of function calls that terminate in writing to the local SQLite3 database,
+                # which uses reserved locks to limit more than one process writing to the database
+                # at any given time. Therefore, increasing the process pool here substantially would
+                # not really help, even if this were run on a system with many more physical cores.              
                 pool = Pool(input_size if input_size <= 150 else 150)
                 for feed_url, article_url in article_urls:
                     pool.apply_async(process_article, args=(feed_url, article_url,))

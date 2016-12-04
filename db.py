@@ -7,8 +7,10 @@ import sys
 
 class FeedsDB(object):
 
-    # No path checking here, assume the files will live in same directory
-    # as the scraper and db.py.
+    # The SQLite3 database file and schema. No path checking here because I assume the
+    # files will live in same directory as the scraper and this module. In principle
+    # SQLite3 could be replaced by any other RDBMS with a Python binding, with
+    # minimal changes here.
     DB_FILE = 'feeds.db'
     DB_SCHEMA = 'schema.sql'
 
@@ -23,6 +25,18 @@ class FeedsDB(object):
                     db.executescript(schema)
 
     def _insert_row(self, table, columns, values):
+        # SQLite3 supports multiple threads and processes connecting to and reading
+        # from the database via a shared lock, but only permits one thread or process
+        # to write to the database at any given time via a so-called reserved lock.
+        #
+        # https://www.sqlite.org/atomiccommit.html
+        #
+        # As the scraper runs this method is called in the context of multiple processes
+        # trying to write to the database, but each much wait its turn for the reserved
+        # lock to be released, which is where the connection timeout is relevant. Not
+        # specifying a timeout value for the connection means that a process may have too
+        # long for SQLite3 to release the lock in which case it throws an OperationalError.
+        # I've used the default timeout period of 5 seconds.
         with sqlite3.connect(self.DB_FILE, timeout=5000) as db:
             with closing(db.cursor()) as cursor:
                 try:                    

@@ -1,3 +1,6 @@
+# Gets the inner markup of a symmetric SGML/XML/HTML tag, i.e. one with
+# a starting and ending tag, e.g. <item> ... </item>. Does not work with
+# non-symmetric tags, e.g. <meta name=... content=... />.
 def scrape_inner_tag(text, tag_name):
     start_tag = '<{}>'.format(tag_name)
     end_tag = '</{}>'.format(tag_name)

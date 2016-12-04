@@ -1,5 +1,12 @@
 from uuid import uuid4
 
+# This is meant to be something like an ORM for the feeds SQLite3 database, except
+# only containing models matching the database tables to permit easy writing to
+# the database, but without methods to get data back as Python objects (although
+# that could easily be done.)
+
+# The ancestor for all database model objects, not meant to be instantiated
+# directly, but through its children.
 class FeedsDBModel(object):
     def __init__(self, uuid=str(uuid4())):
         self._uuid = uuid
