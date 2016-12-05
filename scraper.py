@@ -82,14 +82,14 @@ def save_tag(tag_json):
 # I have chosen to make them standalone methods.
     
 if __name__ == '__main__':
-    print('\n\tWelcome to the RSS feed scraper!')
     FeedsDB.setup()
 
     while(True):
         option = input(     
             '\n\tPlease enter a comma-separated list of RSS feed URLs to scrape ('
             'the scraper saves all articles in the feed to a local '
-            'database), or type "Q" to exit.\n\t>> '
+            'SQLite3 database in the same location as this script),'
+            ' or type "Q" to exit.\n\n\t>> '
         )
         if not option == 'Q':
             print('\n')
