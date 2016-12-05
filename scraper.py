@@ -148,7 +148,7 @@ if __name__ == '__main__':
                 print('\tSCRAPER: {}'.format(str(e)))
                 errors += 1
                 successes = len(article_urls) - errors
-            else:
+            finally:
                 print(
                     '\n\tSCRAPER: Scraped {}/{} articles from {} RSS feeds in {} seconds '
                     '(@ {} articles per second). {} errors encountered.\n'.
