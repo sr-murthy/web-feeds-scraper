@@ -34,7 +34,7 @@ Example usage:
     DB does not exist, creating DB feeds.db ... 
     creating DB schema 
 
-    Please enter a comma-separated list of RSS feed URLs to scrape (the scraper saves all articles in the feed to a local database), or type "Q" to exit.
+    Enter a comma-separated list of RSS feed URLs to scrape (the scraper saves all articles in the feed to a local database), or type "Q" to exit.
 
     >> http://rss.nytimes.com/services/xml/rss/nyt/HomePage.xml, http://feeds.bbci.co.uk/news/england/rss.xml?edition=uk, http://feeds.skynews.com/feeds/rss/uk.xml, http://newsrss.bbc.co.uk/rss/newsonline_uk_edition/in_depth/uk/2001/uk_and_the_euro/rss.xml, http://www.telegraph.co.uk/sport/rss.xml, https://www.theguardian.com/uk/rss
 
