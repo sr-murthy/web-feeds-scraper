@@ -20,6 +20,7 @@ from models import (
     Article,
     Tag,
 )
+
 from utils import scrape_article_urls
 
 def get_article_urls(feed_url):
@@ -86,7 +87,7 @@ if __name__ == '__main__':
 
     while(True):
         option = input(     
-            '\n\tPlease enter a comma-separated list of RSS feed URLs to scrape ('
+            '\n\tEnter a comma-separated list of RSS feed URLs to scrape ('
             'the scraper saves all articles in the feed to a local '
             'SQLite3 database in the same location as this script),'
             ' or type "Q" to exit.\n\n\t>> '
