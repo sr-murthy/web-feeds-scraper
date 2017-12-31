@@ -25,7 +25,7 @@ The database has the following simple schema:
         foreign key(article_uuid) references article(uuid) on update cascade on delete cascade
     );
 
-Example usage:
+Usage:
 
     $ ./scraper.py
 
